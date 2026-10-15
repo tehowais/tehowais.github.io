@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ingenium Action Schedule</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7f9;--surface:#fff;--text:#1d2330;--muted:#5d6675;--line:#dde1e8;--wknd:#eef0f4;--past:#e9ebef;--key:#1c1917;--none:#6b7280;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171d;--surface:#1d222b;--text:#eceff4;--muted:#a3adbd;--line:#333a47;--wknd:#232935;--past:#181c23;--key:#f1efe9;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14171d;--surface:#1d222b;--text:#eceff4;--muted:#a3adbd;--line:#333a47;--wknd:#232935;--past:#181c23;--key:#f1efe9;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.5 "Instrument Sans",system-ui,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:40px 20px 64px}
+h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(28px,5vw,42px);line-height:1.1}
+.sub{color:var(--muted);margin:10px 0 4px;font-size:17px}
+.upd{color:var(--muted);font-size:14px}
+h2{font-size:24px;margin:44px 0 14px}
+.keyrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.pill{display:inline-block;color:#fff;font-weight:600;font-size:13px;padding:4px 12px;border-radius:99px}
+.cal{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.grid{display:grid;grid-template-columns:repeat(7,minmax(118px,1fr));min-width:830px}
+.dow{padding:8px 10px;font-size:13px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--line)}
+.day{min-height:104px;padding:6px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.day:nth-child(7n){border-right:0}
+.day.we{background:var(--wknd)}
+.day.past{background:var(--past);opacity:.6}
+.day.today{box-shadow:inset 0 0 0 2px var(--text)}
+.num{font-size:13px;font-weight:600;color:var(--muted)}
+.today .num{color:var(--text)}
+.chip{color:#fff;border-radius:5px;padding:3px 6px;font-size:11.5px;line-height:1.25}
+.chip b{display:block;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase}
+.chip.keyd{background:var(--key);color:var(--bg);font-weight:600}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.card h3{color:#fff;font-size:19px;padding:12px 16px}
+.task{padding:14px 16px;border-top:1px solid var(--line)}
+.task:first-of-type{border-top:0}
+.dp{display:inline-block;font-size:12.5px;font-weight:600;padding:2px 9px;border-radius:99px;border:1.5px solid currentColor}
+.dp.nd{color:var(--none);border-style:dashed}
+.tt{font-weight:600;margin:6px 0 2px}
+.dt{color:var(--muted);font-size:14.5px}
+.proj{font-size:13px;color:var(--muted)}
+.need{border:2px dashed var(--muted);border-radius:10px;padding:18px 20px;margin-top:18px;background:transparent}
+.need h3{font-size:19px}
+.need p{margin:6px 0 0;color:var(--muted)}
+.chip.un{background:var(--none)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Ingenium Projects: Action Schedule</h1>
+<p class="sub">Who is doing what before the check-in and projects info session on Wed 21 Oct and the project launch on Wed 28 Oct.</p>
+<div class="upd">Updated 16 October 2026</div>
+<div class="keyrow" id="key"></div>
+
+<h2>Calendar</h2>
+<div class="cal"><div class="grid" id="grid"></div></div>
+
+<h2>Who does what</h2>
+<div class="cards" id="cards"></div>
+
+</div>
+<script>
+const P={Sharan:"#1F3A93",Sarah:"#B4530A",Adam:"#0E7C86",Hailey:"#7B3FA0",Naina:"#8A6D00",Jaslene:"#C2185B",Prisha:"#5E6B73"};
+const CI="2026-10-21",LA="2026-10-28";
+const W="Now to Wed 21 Oct",N="Wed 21 Oct",L="By Wed 28 Oct";
+// o owner, p project, t title, d detail, date, pill, c chip label
+const T=[
+{o:"Sharan",p:"River Cleaning Robot",t:"Follow up on the robotics partnership",d:"Include workshop and storage space in the conversation.",date:CI,pill:N,c:"Robotics partner"},
+{o:"Sharan",p:"River Cleaning Robot",t:"Contact lecturers to promote the project",d:"Ongoing outreach across departments.",pill:"No date set"},
+{o:"Sharan",p:"Accessibility Projects",t:"Schedule a feasibility meeting",d:"With Hailey and Naina.",date:CI,pill:W,c:"Book access mtg",win:1},
+{o:"Sharan",p:"Solar-Powered Car",t:"Schedule a feasibility meeting",d:"With Jaslene and Naina.",date:CI,pill:W,c:"Book solar mtg",win:1},
+{o:"Sarah",p:"Classroom in a Crate",t:"Update the brief after the meeting with the professor",d:"Due at the next check-in.",date:CI,pill:N,c:"Update brief"},
+{o:"Sarah",p:"Classroom in a Crate",t:"Find the Civil Engineering contact",d:"Arrange access to Civil Engineering classes to promote the project.",date:CI,pill:N,c:"Civil Eng contact"},
+{o:"Adam",p:"Nano Labyrinth",t:"Follow up with potential judges",d:"Competition judges.",date:CI,pill:W,c:"Chase judges",win:1},
+{o:"Adam",p:"Nano Labyrinth",t:"Contact UKAEA",d:"Ask about involvement or a stall.",date:CI,pill:N,c:"UKAEA"},
+{o:"Adam",p:"Nano Labyrinth",t:"Compile the team and member list",d:"Confirm an EEE student contact for every team. Due before lab inductions.",pill:"No date set"},
+{o:"Hailey",p:"Accessibility Projects",t:"Schedule a feasibility meeting",d:"With Sharan and Naina.",date:CI,pill:W,c:"Book access mtg",win:1},
+{o:"Hailey",p:"Accessibility Projects",t:"Research accessibility competitions",d:"Existing competitions, possible formats and collaborators. Finish before the feasibility meeting.",pill:"No date set"},
+{o:"Naina",p:"Accessibility Projects",t:"Schedule a feasibility meeting",d:"With Hailey and Sharan.",date:CI,pill:W,c:"Book access mtg",win:1},
+{o:"Naina",p:"Solar-Powered Car",t:"Schedule a feasibility meeting",d:"With Jaslene and Sharan.",date:CI,pill:W,c:"Book solar mtg",win:1},
+{o:"Jaslene",p:"Solar-Powered Car",t:"Schedule a feasibility meeting",d:"With Sharan and Naina.",date:CI,pill:W,c:"Book solar mtg",win:1},
+{o:"Jaslene",p:"Solar-Powered Car",t:"Investigate heat-to-electricity conversion",d:"Also how to integrate the two inputs into the battery. Finish before the feasibility meeting.",pill:"No date set"},
+{o:"Jaslene",p:"Solar-Powered Car",t:"Update the brief with products and components",d:"Finish before the feasibility meeting.",pill:"No date set"},
+{o:"Prisha",p:"Compact Water Recycling Plant",t:"Send Nadeem a written progress report",d:"Include specific questions. Replaces arranging a meeting.",date:CI,pill:W,c:"Report to Nadeem",win:1},
+{o:"Prisha",p:"Compact Water Recycling Plant",t:"Prepare a detailed cost analysis",d:"Itemised materials list, uploaded to Teams.",date:CI,pill:N,c:"Cost analysis"},
+{o:"Prisha",p:"Compact Water Recycling Plant",t:"Estimate team size and disciplines needed",d:"Which engineering disciplines the project needs.",date:LA,pill:L,c:"Team size"},
+{o:"Prisha",p:"Compact Water Recycling Plant",t:"Contact a staff member for guidance",d:"Before project launch.",date:LA,pill:L,c:"Staff contact"},
+{o:"Prisha",p:"Compact Water Recycling Plant",t:"Start background research",d:"Ask Nadeem to share existing research to set a baseline.",date:LA,pill:L,c:"Background research"}
+];
+const U=[];
+
+const $=id=>document.getElementById(id);
+$("key").innerHTML=Object.keys(P).map(n=>`<span class="pill" style="background:${P[n]}">${n}</span>`).join("")+
+ `<span class="pill" style="background:var(--key);color:var(--bg)">Key date</span>`;
+
+const iso=d=>d.toISOString().slice(0,10);
+const now=new Date(),today=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+const by={};
+const add=(k,h)=>(by[k]=by[k]||[]).push(h);
+add(CI,`<div class="chip keyd">Check-in and projects info session</div>`);
+add(LA,`<div class="chip keyd">Project launch</div>`);
+T.forEach(x=>{if(x.date)add(x.date,`<div class="chip" style="background:${P[x.o]}"><b>${x.o}</b>${x.win?"By check-in: ":""}${x.c}</div>`)});
+U.forEach(x=>add(x.date,`<div class="chip un"><b>Needs owner</b>${x.c}</div>`));
+
+let g=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d=>`<div class="dow">${d}</div>`).join("");
+const start=Date.UTC(2026,9,12);
+for(let i=0;i<21;i++){
+ const d=new Date(start+i*864e5),k=iso(d),dow=i%7;
+ const cls=["day",dow>4?"we":"",k<today?"past":"",k===today?"today":""].join(" ");
+ const lab=d.getUTCDate()+(d.getUTCDate()===1||i===0?" "+d.toLocaleString("en-GB",{month:"short",timeZone:"UTC"}):"");
+ g+=`<div class="${cls}"><span class="num">${lab}</span>${(by[k]||[]).join("")}</div>`;
+}
+$("grid").innerHTML=g;
+
+const ord=a=>[...a].sort((x,y)=>(x.date||"9")<(y.date||"9")?-1:(x.date||"9")>(y.date||"9")?1:0);
+$("cards").innerHTML=Object.keys(P).map(n=>{
+ const ts=ord(T.filter(x=>x.o===n));
+ return `<div class="card"><h3 style="background:${P[n]}">${n}</h3>`+ts.map(x=>
+  `<div class="task"><span class="dp ${x.date?"":"nd"}">${x.pill}</span><div class="tt">${x.t}</div><div class="proj">${x.p}</div><div class="dt">${x.d}</div></div>`).join("")+`</div>`}).join("");
+
+</script>
+</body>
+</html>
