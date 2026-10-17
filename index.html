@@ -44,6 +44,7 @@ h2{font-size:24px;margin:44px 0 14px}
 .dp.nd{color:var(--none);border-style:dashed}
 .tt{font-weight:600;margin:6px 0 2px}
 .dt{color:var(--muted);font-size:14.5px}
+.done{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}.dn{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px}.dn .tt{text-decoration:line-through;text-decoration-thickness:1px}
 .proj{font-size:13px;color:var(--muted)}
 .need{border:2px dashed var(--muted);border-radius:10px;padding:18px 20px;margin-top:18px;background:transparent}
 .need h3{font-size:19px}
@@ -64,6 +65,8 @@ h2{font-size:24px;margin:44px 0 14px}
 <h2>Who does what</h2>
 <div class="cards" id="cards"></div>
 
+<div id="donewrap"><h2>Done this week</h2><div class="done" id="done"></div></div>
+
 </div>
 <script>
 const P={Sharan:"#1F3A93",Sarah:"#B4530A",Adam:"#0E7C86",Hailey:"#7B3FA0",Naina:"#8A6D00",Jaslene:"#C2185B",Prisha:"#5E6B73"};
@@ -77,8 +80,7 @@ const T=[
 {o:"Sharan",p:"Solar-Powered Car",t:"Schedule a feasibility meeting",d:"With Jaslene and Naina.",date:CI,pill:W,c:"Book solar mtg",win:1},
 {o:"Sarah",p:"Classroom in a Crate",t:"Update the brief after the meeting with the professor",d:"Due at the next check-in.",date:CI,pill:N,c:"Update brief"},
 {o:"Sarah",p:"Classroom in a Crate",t:"Find the Civil Engineering contact",d:"Arrange access to Civil Engineering classes to promote the project.",date:CI,pill:N,c:"Civil Eng contact"},
-{o:"Adam",p:"Nano Labyrinth",t:"Follow up with potential judges",d:"Competition judges.",date:CI,pill:W,c:"Chase judges",win:1},
-{o:"Adam",p:"Nano Labyrinth",t:"Contact UKAEA",d:"Ask about involvement or a stall.",date:CI,pill:N,c:"UKAEA"},
+{o:"Adam",p:"Nano Labyrinth",t:"Follow up with potential judges",d:"Competition judges.",pill:"No date set"},
 {o:"Adam",p:"Nano Labyrinth",t:"Compile the team and member list",d:"Confirm an EEE student contact for every team. Due before lab inductions.",pill:"No date set"},
 {o:"Hailey",p:"Accessibility Projects",t:"Schedule a feasibility meeting",d:"With Sharan and Naina.",date:CI,pill:W,c:"Book access mtg",win:1},
 {o:"Hailey",p:"Accessibility Projects",t:"Research accessibility competitions",d:"Existing competitions, possible formats and collaborators. Finish before the feasibility meeting.",pill:"No date set"},
@@ -94,6 +96,8 @@ const T=[
 {o:"Prisha",p:"Compact Water Recycling Plant",t:"Start background research",d:"Ask Nadeem to share existing research to set a baseline.",date:LA,pill:L,c:"Background research"}
 ];
 const U=[];
+// Done this week: {o owner, p project, t title}
+const D=[{o:"Adam",p:"Nano Labyrinth",t:"Contact UKAEA about involvement or a stall"}];
 
 const $=id=>document.getElementById(id);
 $("key").innerHTML=Object.keys(P).map(n=>`<span class="pill" style="background:${P[n]}">${n}</span>`).join("")+
@@ -124,6 +128,7 @@ $("cards").innerHTML=Object.keys(P).map(n=>{
  return `<div class="card"><h3 style="background:${P[n]}">${n}</h3>`+ts.map(x=>
   `<div class="task"><span class="dp ${x.date?"":"nd"}">${x.pill}</span><div class="tt">${x.t}</div><div class="proj">${x.p}</div><div class="dt">${x.d}</div></div>`).join("")+`</div>`}).join("");
 
+if(D.length)$("done").innerHTML=D.map(x=>`<div class="dn"><span class="pill" style="background:${P[x.o]}">${x.o}</span><div class="tt">${x.t}</div><div class="proj">${x.p}</div></div>`).join("");else $("donewrap").remove();
 </script>
 </body>
 </html>
