@@ -50,17 +50,25 @@ h2{font-size:24px;margin:44px 0 14px}
 .need h3{font-size:19px}
 .need p{margin:6px 0 0;color:var(--muted)}
 .chip.un{background:var(--none)}
+.tabs{display:flex;gap:8px;margin:0 0 12px}
+.tab{font:600 14px "Instrument Sans",system-ui,sans-serif;padding:6px 16px;border-radius:99px;border:1.5px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer}
+.tab[aria-pressed="true"]{background:var(--key);color:var(--bg);border-color:var(--key)}
+.tab:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.day.out{background:var(--past);opacity:.45}
+.empty{margin:10px 2px 0;color:var(--muted);font-size:14px}
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1>Ingenium Projects: Action Schedule</h1>
-<p class="sub">Who is doing what before the check-in and projects info session on Wed 21 Oct and the project launch on Wed 28 Oct.</p>
-<div class="upd">Updated 16 October 2026</div>
+<p class="sub">Who is doing what before the project launch on Wed 28 Oct.</p>
+<div class="upd">Updated 23 October 2026</div>
 <div class="keyrow" id="key"></div>
 
 <h2>Calendar</h2>
+<div class="tabs" role="group" aria-label="Calendar month"><button type="button" class="tab" id="tab-oct" data-m="oct" aria-pressed="true">October</button><button type="button" class="tab" id="tab-nov" data-m="nov" aria-pressed="false">November</button></div>
 <div class="cal"><div class="grid" id="grid"></div></div>
+<p class="empty" id="calnote" hidden>No dated actions in November yet.</p>
 
 <h2>Who does what</h2>
 <div class="cards" id="cards"></div>
@@ -70,34 +78,39 @@ h2{font-size:24px;margin:44px 0 14px}
 </div>
 <script>
 const P={Sharan:"#1F3A93",Sarah:"#B4530A",Adam:"#0E7C86",Hailey:"#7B3FA0",Naina:"#8A6D00",Jaslene:"#C2185B",Prisha:"#5E6B73"};
-const CI="2026-10-21",LA="2026-10-28";
-const W="Now to Wed 21 Oct",N="Wed 21 Oct",L="By Wed 28 Oct";
+const LA="2026-10-28",EM="2026-10-31",FR="2026-10-23";
+const L="By Wed 28 Oct",M="Now to Wed 28 Oct",E="By Sat 31 Oct",F="Fri 23 Oct";
 // o owner, p project, t title, d detail, date, pill, c chip label
 const T=[
-{o:"Sharan",p:"River Cleaning Robot",t:"Follow up on the robotics partnership",d:"Include workshop and storage space in the conversation.",date:CI,pill:N,c:"Robotics partner"},
+{o:"Sharan",p:"River Cleaning Robot",t:"Confirm the partnership with the robotics startup",d:"Include workshop and storage space in the conversation.",pill:"No date set"},
+{o:"Sharan",p:"River Cleaning Robot",t:"Continue defining subsystems and outlining parts to design",d:"Due by the end of the month.",date:EM,pill:E,c:"Define subsystems"},
+{o:"Sharan",p:"River Cleaning Robot",t:"Complete the engineering portfolio template",d:"Used to document progress. Due by the end of the month.",date:EM,pill:E,c:"Portfolio template"},
+{o:"Sharan",p:"River Cleaning Robot",t:"Begin searching for mentors and compile a list of potential sponsors",d:"Two lists: possible mentors and possible sponsors.",pill:"No date set"},
 {o:"Sharan",p:"River Cleaning Robot",t:"Contact lecturers to promote the project",d:"Ongoing outreach across departments.",pill:"No date set"},
-{o:"Sharan",p:"Accessibility Projects",t:"Schedule a feasibility meeting",d:"With Hailey and Naina.",date:CI,pill:W,c:"Book access mtg",win:1},
-{o:"Sharan",p:"Solar-Powered Car",t:"Schedule a feasibility meeting",d:"With Jaslene and Naina.",date:CI,pill:W,c:"Book solar mtg",win:1},
-{o:"Sarah",p:"Classroom in a Crate",t:"Update the brief after the meeting with the professor",d:"Due at the next check-in.",date:CI,pill:N,c:"Update brief"},
-{o:"Sarah",p:"Classroom in a Crate",t:"Find the Civil Engineering contact",d:"Arrange access to Civil Engineering classes to promote the project.",date:CI,pill:N,c:"Civil Eng contact"},
-{o:"Adam",p:"Nano Labyrinth",t:"Follow up with potential judges",d:"Competition judges.",pill:"No date set"},
+{o:"Sharan",p:"Accessibility Projects",t:"Schedule a feasibility meeting",d:"With Hailey and Naina.",date:LA,pill:M,c:"Book access mtg"},
+{o:"Sharan",p:"Solar-Powered Car",t:"Schedule a feasibility meeting",d:"With Jaslene and Naina.",date:LA,pill:M,c:"Book solar mtg"},
+{o:"Sarah",p:"Classroom in a Crate",t:"Finalise the brief to reflect the advanced version",d:"Before project launch.",date:LA,pill:L,c:"Finalise brief"},
+{o:"Sarah",p:"Classroom in a Crate",t:"Reach out to PhD students to ask about mentorship",d:"Mentors for the project.",pill:"No date set"},
+{o:"Sarah",p:"Classroom in a Crate",t:"Message the Arup contact about sponsorship",d:"Sponsorship outreach.",pill:"No date set"},
+{o:"Adam",p:"Nano Labyrinth",t:"Follow up in person with the controls lecturer",d:"About judges for the competition.",date:FR,pill:F,c:"Controls lecturer"},
+{o:"Adam",p:"Nano Labyrinth",t:"Reach out to AUAR about involvement at the Expo",d:"Possible AUAR involvement at the Expo.",pill:"No date set"},
 {o:"Adam",p:"Nano Labyrinth",t:"Compile the team and member list",d:"Confirm an EEE student contact for every team. Due before lab inductions.",pill:"No date set"},
-{o:"Hailey",p:"Accessibility Projects",t:"Schedule a feasibility meeting",d:"With Sharan and Naina.",date:CI,pill:W,c:"Book access mtg",win:1},
+{o:"Hailey",p:"Accessibility Projects",t:"Schedule a feasibility meeting",d:"With Sharan and Naina.",date:LA,pill:M,c:"Book access mtg"},
 {o:"Hailey",p:"Accessibility Projects",t:"Research accessibility competitions",d:"Existing competitions, possible formats and collaborators. Finish before the feasibility meeting.",pill:"No date set"},
-{o:"Naina",p:"Accessibility Projects",t:"Schedule a feasibility meeting",d:"With Hailey and Sharan.",date:CI,pill:W,c:"Book access mtg",win:1},
-{o:"Naina",p:"Solar-Powered Car",t:"Schedule a feasibility meeting",d:"With Jaslene and Sharan.",date:CI,pill:W,c:"Book solar mtg",win:1},
-{o:"Jaslene",p:"Solar-Powered Car",t:"Schedule a feasibility meeting",d:"With Sharan and Naina.",date:CI,pill:W,c:"Book solar mtg",win:1},
+{o:"Naina",p:"Accessibility Projects",t:"Schedule a feasibility meeting",d:"With Hailey and Sharan.",date:LA,pill:M,c:"Book access mtg"},
+{o:"Naina",p:"Solar-Powered Car",t:"Schedule a feasibility meeting",d:"With Jaslene and Sharan.",date:LA,pill:M,c:"Book solar mtg"},
+{o:"Jaslene",p:"Solar-Powered Car",t:"Schedule a feasibility meeting",d:"With Sharan and Naina.",date:LA,pill:M,c:"Book solar mtg"},
 {o:"Jaslene",p:"Solar-Powered Car",t:"Investigate heat-to-electricity conversion",d:"Also how to integrate the two inputs into the battery. Finish before the feasibility meeting.",pill:"No date set"},
 {o:"Jaslene",p:"Solar-Powered Car",t:"Update the brief with products and components",d:"Finish before the feasibility meeting.",pill:"No date set"},
-{o:"Prisha",p:"Compact Water Recycling Plant",t:"Send Nadeem a written progress report",d:"Include specific questions. Replaces arranging a meeting.",date:CI,pill:W,c:"Report to Nadeem",win:1},
-{o:"Prisha",p:"Compact Water Recycling Plant",t:"Prepare a detailed cost analysis",d:"Itemised materials list, uploaded to Teams.",date:CI,pill:N,c:"Cost analysis"},
-{o:"Prisha",p:"Compact Water Recycling Plant",t:"Estimate team size and disciplines needed",d:"Which engineering disciplines the project needs.",date:LA,pill:L,c:"Team size"},
+{o:"Prisha",p:"Compact Water Recycling Plant",t:"Decide structure and maximum cutoff",d:"Replaces estimating team size and disciplines.",date:LA,pill:L,c:"Structure and cutoff"},
 {o:"Prisha",p:"Compact Water Recycling Plant",t:"Contact a staff member for guidance",d:"Before project launch.",date:LA,pill:L,c:"Staff contact"},
-{o:"Prisha",p:"Compact Water Recycling Plant",t:"Start background research",d:"Ask Nadeem to share existing research to set a baseline.",date:LA,pill:L,c:"Background research"}
+{o:"Prisha",p:"Compact Water Recycling Plant",t:"Send Nadeem a written progress report",d:"Include specific questions. Replaces arranging a meeting.",pill:"No date set"},
+{o:"Prisha",p:"Compact Water Recycling Plant",t:"Make a more detailed cost brief",d:"Itemised materials list, uploaded to Teams.",pill:"No date set"},
+{o:"Prisha",p:"Compact Water Recycling Plant",t:"Decide questions for specialist interviews",d:"Questions to prepare before the interviews.",pill:"No date set"}
 ];
 const U=[];
 // Done this week: {o owner, p project, t title}
-const D=[{o:"Adam",p:"Nano Labyrinth",t:"Contact UKAEA about involvement or a stall"}];
+const D=[];
 
 const $=id=>document.getElementById(id);
 $("key").innerHTML=Object.keys(P).map(n=>`<span class="pill" style="background:${P[n]}">${n}</span>`).join("")+
@@ -107,20 +120,29 @@ const iso=d=>d.toISOString().slice(0,10);
 const now=new Date(),today=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
 const by={};
 const add=(k,h)=>(by[k]=by[k]||[]).push(h);
-add(CI,`<div class="chip keyd">Check-in and projects info session</div>`);
 add(LA,`<div class="chip keyd">Project launch</div>`);
 T.forEach(x=>{if(x.date)add(x.date,`<div class="chip" style="background:${P[x.o]}"><b>${x.o}</b>${x.win?"By check-in: ":""}${x.c}</div>`)});
 U.forEach(x=>add(x.date,`<div class="chip un"><b>Needs owner</b>${x.c}</div>`));
 
-let g=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d=>`<div class="dow">${d}</div>`).join("");
-const start=Date.UTC(2026,9,12);
-for(let i=0;i<21;i++){
- const d=new Date(start+i*864e5),k=iso(d),dow=i%7;
- const cls=["day",dow>4?"we":"",k<today?"past":"",k===today?"today":""].join(" ");
- const lab=d.getUTCDate()+(d.getUTCDate()===1||i===0?" "+d.toLocaleString("en-GB",{month:"short",timeZone:"UTC"}):"");
- g+=`<div class="${cls}"><span class="num">${lab}</span>${(by[k]||[]).join("")}</div>`;
+// October view runs from the current week; November shows the whole month. Days outside the month are dimmed and left empty.
+const MONTHS={oct:{start:Date.UTC(2026,9,19),weeks:2,month:9},nov:{start:Date.UTC(2026,9,26),weeks:6,month:10}};
+function drawCal(key){
+ const m=MONTHS[key];
+ let g=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d=>`<div class="dow">${d}</div>`).join(""),n=0;
+ for(let i=0;i<m.weeks*7;i++){
+  const d=new Date(m.start+i*864e5),k=iso(d),dow=i%7,inM=d.getUTCMonth()===m.month;
+  const cls=["day",dow>4?"we":"",inM&&k<today?"past":"",inM&&k===today?"today":"",inM?"":"out"].join(" ");
+  const lab=d.getUTCDate()+(d.getUTCDate()===1||i===0?" "+d.toLocaleString("en-GB",{month:"short",timeZone:"UTC"}):"");
+  const chips=inM?(by[k]||[]):[];
+  n+=chips.length;
+  g+=`<div class="${cls}"><span class="num">${lab}</span>${chips.join("")}</div>`;
+ }
+ $("grid").innerHTML=g;
+ document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.m===key)));
+ $("calnote").hidden=n>0;
 }
-$("grid").innerHTML=g;
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>drawCal(b.dataset.m)));
+drawCal("oct");
 
 const ord=a=>[...a].sort((x,y)=>(x.date||"9")<(y.date||"9")?-1:(x.date||"9")>(y.date||"9")?1:0);
 $("cards").innerHTML=Object.keys(P).map(n=>{
